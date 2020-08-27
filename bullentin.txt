@@ -1,0 +1,22 @@
+"""""""""""""""""""""""
+  BULLETIN BOARD
+"""""""""""""""""""""""
+
+"""""""""""""""""""""""
+TO DO:
+"""""""""""""""""""""""
+Apply comments to every project.
+Broaden range of different servers
+
+
+
+""""""""""""""""""""""""
+  Under development:
+""""""""""""""""""""""""
+
+
+""""""""""""""""""""""""
+  Recently  Finished:
+""""""""""""""""""""""""
+1. Shutdown command finished. May need some adjustments to which permission grants the command. 
+2. Make a inspirational quote generator. Using inpirobot. But needs many things in place before this can happen. 
