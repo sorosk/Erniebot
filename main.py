@@ -78,5 +78,5 @@ async def sleepfunction():
   return
 
 keep_alive() #calls keep_alive for keeping the bot alive and preventing it from shutting down after 1 hour
-token = ("NjcxMDEzOTM0ODk1MDcxMjMy.Xi2wbA.k70Dqc08MJyU1pqCXH8uEN4qKyE") #secret token
+token = os.environ['secretkey'] #secret token
 bot.run(token, bot = True, reconnect = True) #runs bot
