@@ -1,11 +1,14 @@
 from discord.ext import commands
 from discord.ext.commands import has_permissions, MissingPermissions
-from datetime import datetime as d
+from utils import notify_user
+import datetime as d
 import random
 import todayprime
 import memes2
 import requests
+import discord
 import re
+import load
 # New - The Cog class must extend the commands.Cog class
 
 ChanID = { #used for the say command.
@@ -25,7 +28,9 @@ ChanID = { #used for the say command.
   'ernie-hungergames':672093804672843787,
   'ernie-pc':683012582151684097,
   'test':692315307057872907,
-  'invasion':694498940380250123
+  'invasion':694498940380250123,
+  'bot':832526234553810954,
+  'spam':819305751046127657
 }
 
 class Basic(commands.Cog):
@@ -52,7 +57,7 @@ class Basic(commands.Cog):
     return
   @commands.command(
       name='drunk',
-      description='The drunken sailor',
+      description='This doesnt work, its just silly anyways',
       aliases=['dr']
   )
   async def drunk_command(self, ctx):
@@ -80,13 +85,15 @@ class Basic(commands.Cog):
   async def say_stuff(self, ctx, arg1, *, arg2):
     channel = ctx.bot.get_channel(ChanID[arg1])
     await channel.send(arg2)
-    owner = ctx.bot.get_user(173792811169218570)
+    owner = ctx.bot.get_user(173792811169218570) 
     print(arg1, arg2)
-    user = ctx.message.author #hvem som har skrevet meldingen
+    user = ctx.author.name #hvem som har skrevet meldingen
     print(user)
-    await owner.send(user) #sender 3 meldinger til eieren. Smart for å vite hvem som har sagt hva
-    await owner.send(arg2)
-    await owner.send(arg1)
+    archive = ctx.bot.get_channel(832526234553810954)
+    now = d.datetime.now() # current date and time
+    date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+    msg = date_time, user, "Said:", arg2, "in #", arg1
+    await archive.send(msg) #sender 3 meldinger til eieren. Smart for å vite hvem som har sagt hva
     return
   @commands.command(
       name='meme',
@@ -95,7 +102,7 @@ class Basic(commands.Cog):
   )
   async def meme(self, ctx):
     randmeme = random.choice(memes2.erniememe)
-    await ctx.send('Here is a ernie meme' + randmeme)
+    await ctx.send('Here is an ernie meme' + randmeme)
 
   @commands.command(
       name='shutdown',
@@ -138,8 +145,53 @@ class Basic(commands.Cog):
     pat = re.compile(r'<\s*img [^>]*src="([^"]+)')
     img = pat.findall(html)
     await ctx.send(html)
+  @commands.command(
+        name='DM',
+        description='Direct message to another user, remember to use @mention. If else it wont work and thats sad',
+        aliases=['PM'] 
+        )
+  async def poke(self, ctx, member: discord.Member = None, *, message):
+    if member is not None:
+        await notify_user(member, message)
+        archive = ctx.bot.get_channel(832526234553810954)
+        user = ctx.author.name #hvem som har skrevet meldingen
+        msg = user, "Said:", message, "to:", member.name
+        await archive.send(msg)
+    else:
+        await ctx.send("Please use @mention to poke someone.")
+  @commands.command(
+      name='insult',
+      description='Ernie memes are the best memes',
+      aliases=['jævla']
+  )
+  async def instults(self, ctx):
+    rand = random.choice(load.banneord)
+    str_to_send = "Jævla {0}".format(
+    rand.rstrip("\n"))
+    await ctx.send(str_to_send)
     
-
+  @commands.command(
+      name='regler',
+      description='Ernie memes are the best memes',
+      aliases=['rules']
+  )
+  async def rule(self, ctx):
+    rand = random.choice(load.banneord)
+    rand1 = random.choice(load.verb)
+    str_to_send = "Regel nr {0}, det er ikke lov å {1} {2}".format(
+    random.randint(0, 1000),
+    rand1.rstrip("\n"),
+    rand.rstrip("\n"))
+    await ctx.send(str_to_send)
+  @commands.command(
+      name='pickup',
+      description='Ernie memes are the best memes',
+      aliases=['lines']
+  )
+  async def pickup(self, ctx):
+    rand = random.choice(load.pickup)
+    await ctx.send(rand)
+  
 def setup(client):
     client.add_cog(Basic(client))
     # Adds the Basic commands to the bot

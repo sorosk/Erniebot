@@ -8,6 +8,7 @@ originaldate = date.today()
 import todayprime
 used = True
 
+
 async def morning_post():
   channel = channel = bot.get_channel(393726535418380291)
   prime = todayprime.prime
@@ -39,6 +40,7 @@ async def on_ready(): #When bot have started
     for cog in cogs: #loads all cogs
         bot.load_extension(cog)
     await sleepfunction()
+
     
 async def sleepfunction():
   print("sleepfunction active")
@@ -76,5 +78,5 @@ async def sleepfunction():
   return
 
 keep_alive() #calls keep_alive for keeping the bot alive and preventing it from shutting down after 1 hour
-token = os.environ.get("TOKEN") #secret token
+token = ("NjcxMDEzOTM0ODk1MDcxMjMy.Xi2wbA.k70Dqc08MJyU1pqCXH8uEN4qKyE") #secret token
 bot.run(token, bot = True, reconnect = True) #runs bot
