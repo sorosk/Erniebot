@@ -33,16 +33,24 @@ async def on_ready():
     print("I'm in")
     print(bot.user)
     for cog in cogs:
-        await bot.load_extension(cog)
+        try:
+            await bot.load_extension(cog)
+            print(f"Loaded cog: {cog}")
+        except Exception as e:
+            print(f"Failed to load cog {cog}: {e}")
+    print(f"Loaded commands: {[cmd.name for cmd in bot.commands]}")
     asyncio.create_task(sleepfunction())
 
 @bot.event
 async def on_command(ctx):
-    owner = await bot.fetch_user(bot.owner_id)
-    if owner and ctx.author.id != bot.owner_id:
-        server = ctx.guild.name if ctx.guild else "DM"
-        channel = ctx.channel.name if hasattr(ctx.channel, 'name') else "DM"
-        await owner.send(f"Command used: `{ctx.command.name}` by **{ctx.author}** in #{channel} ({server})")
+    try:
+        owner = await bot.fetch_user(bot.owner_id)
+        if owner:
+            server = ctx.guild.name if ctx.guild else "DM"
+            channel = ctx.channel.name if hasattr(ctx.channel, 'name') else "DM"
+            await owner.send(f"Command used: `{ctx.command.name}` by **{ctx.author}** in #{channel} ({server})")
+    except Exception as e:
+        print(f"Failed to send DM notification: {e}")
 
 async def morning_post():
     channel = bot.get_channel(393726535418380291)
