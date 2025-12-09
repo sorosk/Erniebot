@@ -36,6 +36,14 @@ async def on_ready():
         await bot.load_extension(cog)
     asyncio.create_task(sleepfunction())
 
+@bot.event
+async def on_command(ctx):
+    owner = await bot.fetch_user(bot.owner_id)
+    if owner and ctx.author.id != bot.owner_id:
+        server = ctx.guild.name if ctx.guild else "DM"
+        channel = ctx.channel.name if hasattr(ctx.channel, 'name') else "DM"
+        await owner.send(f"Command used: `{ctx.command.name}` by **{ctx.author}** in #{channel} ({server})")
+
 async def morning_post():
     channel = bot.get_channel(393726535418380291)
     if channel:
