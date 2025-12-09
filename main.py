@@ -3,80 +3,68 @@ import discord
 import os
 from keep_alive import keep_alive
 import datetime
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
+import asyncio
+
 originaldate = date.today()
-import todayprime
-used = True
+onlycheck = True
 
-
-async def morning_post():
-  channel = channel = bot.get_channel(393726535418380291)
-  prime = todayprime.prime
-  await channel.send("God morgen dere! Datoen i dag er",originaldate)
-  await channel.send("Dagens primtall er forresten:", prime)
-  await channel.send("Takk for meg! Kommer tilbake med oppdatering i morgen :)")
-  sleepfunction()
-def get_prefix(client, message): #Sets prefix
-
-    prefixes = ['=', '==']    # sets the prefixes, u can keep it as an array of only 1 item if you need only one prefix
-
+def get_prefix(client, message):
+    prefixes = ['=', '==']
     if not message.guild:
-        prefixes = ['==']   # Only allow '==' as a prefix when in DMs, this is optional
-
-    # Allow users to @mention the bot instead of using a prefix when using a command. Also optional
-    # Do `return prefixes` if u don't want to allow mentions instead of prefix.
+        prefixes = ['==']
     return commands.when_mentioned_or(*prefixes)(client, message)
-bot = commands.Bot(                         # Create a new bot
-    command_prefix=get_prefix,              #calls the prefix function
-    description='Erniebot, the homemade bot run on Repl.it server (free). Anyways, the bot is quite shit. And has almost no commands. But hey, its name has Ernie in it at least.',  # Sets a description for the bot
-    owner_id=173792811169218570,  #owner id for 'say'command. Not used anymore though...
-    case_insensitive=True       
+
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
+
+bot = commands.Bot(
+    command_prefix=get_prefix,
+    description='Erniebot, the homemade bot run on Repl.it server (free). Anyways, the bot is quite shit. And has almost no commands. But hey, its name has Ernie in it at least.',
+    owner_id=173792811169218570,
+    case_insensitive=True,
+    intents=intents
 )
-cogs = ['cogs.basic'] #which cogs is active
+
+cogs = ['cogs.basic']
+
 @bot.event
-async def on_ready(): #When bot have started
+async def on_ready():
     print("I'm in")
     print(bot.user)
-    for cog in cogs: #loads all cogs
-        bot.load_extension(cog)
+    for cog in cogs:
+        await bot.load_extension(cog)
+    asyncio.create_task(sleepfunction())
+
+async def morning_post():
+    channel = bot.get_channel(393726535418380291)
+    if channel:
+        today = date.today()
+        await channel.send(f"God morgen dere! Datoen i dag er {today}")
+        await channel.send("Takk for meg! Kommer tilbake med oppdatering i morgen :)")
     await sleepfunction()
 
-    
 async def sleepfunction():
-  print("sleepfunction active")
-  global used
-  if used == True: #Hvis ikke brukt
-    print("Is used")
-    used = False
-    now = datetime.now()
-    today6am = now.replace(hour=6, minute=0, second=0, microsecond=0)
-    if now < today6am: #If before 6am
-      print("Waiting until 6am")
-      await discord.utils.sleep_until(today6am)
-      morning_post()
-    if now > today6am: #If after 6am
-      nextdate = date.today() + timedelta(days=1)
-      nextday = nextdate.day
-      schedule = today6am.replace(day=nextday)
-      print(schedule)
-      await discord.utils.sleep_until(schedule)
-      morning_post()
-  if used == False: #Hvis brukt
     global onlycheck
-    if onlycheck == True: #Hvis kun en er der
-      onlycheck = False
-      now = datetime.datetime.now()
-      nextdate = datetime.date.today() + datetime.timedelta(days=1)
-      today6am = now.replace(hour=6, minute=0, second=0, microsecond=0)
-      nextday = nextdate.day
-      schedule = today6am.replace(date=nextday)
-      await discord.utils.sleep_until(schedule)
-      onlycheck = True
-      morning_post()
-    if onlycheck == False:
-      print("ONLYCHECK ERROR")
-  return
+    print("sleepfunction active")
+    now = datetime.datetime.now()
+    today6am = now.replace(hour=6, minute=0, second=0, microsecond=0)
+    
+    if now < today6am:
+        print("Waiting until 6am")
+        await discord.utils.sleep_until(today6am)
+        await morning_post()
+    else:
+        nextdate = date.today() + timedelta(days=1)
+        schedule = today6am.replace(day=nextdate.day)
+        print(f"Scheduled for: {schedule}")
+        await discord.utils.sleep_until(schedule)
+        await morning_post()
 
-keep_alive() #calls keep_alive for keeping the bot alive and preventing it from shutting down after 1 hour
-token = os.environ['secretkey'] #secret token
-bot.run(token, bot = True, reconnect = True) #runs bot
+keep_alive()
+token = os.environ.get('secretkey')
+if token:
+    bot.run(token, reconnect=True)
+else:
+    print("ERROR: No 'secretkey' environment variable found. Please set your Discord bot token.")
